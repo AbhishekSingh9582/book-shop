@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'single_category_page.dart';
+import 'search_screen.dart';
 
 class CategoryScreen extends StatelessWidget {
   CategoryScreen({super.key});
@@ -28,6 +29,12 @@ class CategoryScreen extends StatelessWidget {
           bottom: BorderSide(color: Color.fromARGB(96, 44, 41, 41), width: 0.6),
           //borderRadius: BorderRadius.only(bottom:Radius.circular(4)),
         ),
+        actions: [
+          IconButton(
+              onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => SearchScreen())),
+              icon: Icon(Icons.search))
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),

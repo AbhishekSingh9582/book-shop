@@ -14,67 +14,12 @@ class BookDetailScreen extends StatefulWidget {
 }
 
 class _BookDetailScreenState extends State<BookDetailScreen> {
-  // @override
-  // bool? _isBookMarked = false;
-  // final user = FirebaseAuth.instance.currentUser!;
-  // void initState() {
-  //   checkBookMark();
-  //   super.initState();
-  // }
-
-  // Future<void> checkBookMark() async {
-  //   DocumentSnapshot<Map<String, dynamic>> snapDoc = await FirebaseFirestore
-  //       .instance
-  //       .collection('users')
-  //       .doc(user.uid)
-  //       .get();
-  //   if (snapDoc.exists) {
-  //     setState(() {
-  //       _isBookMarked = true;
-  //     });
-  //   } else {
-  //     setState(() {
-  //       _isBookMarked = false;
-  //     });
-  //   }
-  // }
-
-  // Future<void> changeBookMark(Function setState) async {
-  //   if (!_isBookMarked!) {
-  //     await FirebaseFirestore.instance
-  //         .collection('users')
-  //         .doc(user.uid)
-  //         .collection('wishList')
-  //         .doc(widget.bookId);
-  //   } else {
-  //     await FirebaseFirestore.instance
-  //         .collection('users')
-  //         .doc(user.uid)
-  //         .collection('wishList')
-  //         .doc(widget.bookId)
-  //         .delete();
-  //   }
-
-  //   setState(() {
-  //     _isBookMarked = !_isBookMarked!;
-  //   });
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         actions: [
           CreateWishListIcon(widget.bookId!),
-          // StatefulBuilder(
-          //     builder: ((context, setState) => IconButton(
-          //           onPressed: () async {
-          //             await changeBookMark(setState);
-          //           },
-          //           icon: _isBookMarked
-          //               ? const Icon(Icons.bookmark_add)
-          //               : const Icon(Icons.bookmark_add_outlined),
-          //         )))
         ],
       ),
       body: FutureBuilder<Book>(
@@ -243,9 +188,6 @@ class _CreateWishListIconState extends State<CreateWishListIcon> {
           .collection('wishList')
           .doc(widget.bookId)
           .set({'boodId': widget.bookId});
-      // .then((value) => setState(() {
-      //       _isBookMarked = !_isBookMarked!;
-      //     }));
     } else {
       await FirebaseFirestore.instance
           .collection('users')
@@ -253,9 +195,6 @@ class _CreateWishListIconState extends State<CreateWishListIcon> {
           .collection('wishList')
           .doc(widget.bookId)
           .delete();
-      // .then((value) => setState(() {
-      //       _isBookMarked = !_isBookMarked!;
-      //     }));
     }
     setState(() {
       _isBookMarked = !_isBookMarked!;

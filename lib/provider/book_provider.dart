@@ -11,6 +11,7 @@ class BookProvider with ChangeNotifier {
   final user = FirebaseAuth.instance.currentUser!;
   List<Book> _fictionCollection = [];
   List<Book> _wishListBooks = [];
+  List<Book> _searchList = [];
 
   List<Book> _animeAndMangaCollection = [];
   List<Book> _actionAndAdventureCollection = [];
@@ -23,6 +24,10 @@ class BookProvider with ChangeNotifier {
   List<Book> _historyCollection = [];
   List<Book> _cookingFoodWineCollection = [];
   List<Book> _computerTechnologyCollection = [];
+
+  List<Book> get searchList {
+    return [..._searchList];
+  }
 
   List<Book> get wishList {
     return [..._wishListBooks];
@@ -100,14 +105,6 @@ class BookProvider with ChangeNotifier {
 
           if (book['volumeInfo'] != null) {
             Map<String, dynamic> volumeInfo = book['volumeInfo'] ?? {};
-
-            // if (book['id'] != null &&
-            //     volumeInfo!['title'] != null &&
-            //     volumeInfo['authors'] &&
-            //     volumeInfo['publishedDate'] != null &&
-            //     volumeInfo['pageCount'] != null &&
-            //     volumeInfo['imageLinks']['thumbnail'] != null) {
-            // print('abcdefgh');
 
             Map<String, dynamic> imageUrl = volumeInfo['imageLinks'] ??
                 {
@@ -222,5 +219,68 @@ class BookProvider with ChangeNotifier {
     _wishListBooks = tempwishList;
     notifyListeners();
     //return wishListBooks;
+  }
+
+  Future<void> getSearchList(String? search) async {
+    List<Book> tempList = [];
+    if (search == '') {
+      _searchList = tempList;
+      return;
+    }
+
+    var url =
+        Uri.parse('https://www.googleapis.com/books/v1/volumes?q=$search');
+
+    final response = await http.get(url);
+
+    try {
+      print(json.decode(response.body));
+      Map<String, dynamic> result =
+          json.decode(response.body) as Map<String, dynamic>;
+
+      if (!result.containsKey('error')) {
+        result['items']!.forEach((book) {
+          print(book['volumeInfo']['title']);
+
+          if (book['volumeInfo'] != null) {
+            Map<String, dynamic> volumeInfo = book['volumeInfo'] ?? {};
+
+            Map<String, dynamic> imageUrl = volumeInfo['imageLinks'] ??
+                {
+                  'smallThumbnail':
+                      'http://books.google.com/books/content?id=1M0Y2RYqffIC&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api'
+                };
+            tempList.add(Book(
+              id: book['id'],
+              title: volumeInfo['title'] ?? '',
+              author: volumeInfo['authors'] != null
+                  ? (volumeInfo['authors'] as List<dynamic>)
+                      .map((author) => author.toString())
+                      .toList()
+                  : [''],
+              publishedDate: volumeInfo['publishedDate'],
+              //  mainCategory: book['mainCategory'],
+              averageRating: volumeInfo['averageRating'] == null
+                  ? '__'
+                  : volumeInfo['averageRating'].toString(),
+              pageCount: volumeInfo['pageCount'],
+              imageLinks: imageUrl['smallThumbnail'],
+              description: volumeInfo['description'],
+              ratingCount: volumeInfo['ratingsCount'],
+            ));
+          }
+          // }
+        });
+        _searchList = tempList;
+        //print('inside book provider ${tempList.length}');
+        //notifyListeners();
+      } else {
+        print('1 page book_provider ${result['error']}');
+      }
+      //return tempList;
+    } catch (e) {
+      print('2 error Occured in book_provider $e');
+      //return tempList;
+    }
   }
 }

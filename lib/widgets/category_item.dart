@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:provider/provider.dart';
 import '../provider/book_provider.dart';
 import '../model/book.dart';
@@ -51,33 +52,90 @@ class _CategoryItemState extends State<CategoryItem> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: _bookFuture,
-      builder: (context, snapshot) => snapshot.connectionState ==
-              ConnectionState.waiting
-          ? Container(
-              width: 160,
-              height: 270,
-              child: Center(child: CircularProgressIndicator()))
-          : Consumer<BookProvider>(builder: (ctx, bookprovider, _) {
-              List<Book>? lst;
-              if (widget.cat == 'fiction') {
-                lst = bookprovider.fictionList;
-              } else if (widget.cat == 'action+adventure') {
-                lst = bookprovider.actionAndAdventureList;
-              } else if (widget.cat == 'novel') {
-                lst = bookprovider.novelList;
-              } else if (widget.cat == 'horror') {
-                lst = bookprovider.horrorList;
-              } else {
-                lst = bookprovider.animeAndMangaList;
-              }
+        future: _bookFuture,
+        builder: (context, snapshot) => snapshot.connectionState ==
+                ConnectionState.waiting
+            // ? Container(
+            //     width: 160,
+            //     height: 270,
+            //     child: Center(child: CircularProgressIndicator()))
+            ? ShimmerEffect()
+            : Consumer<BookProvider>(builder: (ctx, bookprovider, _) {
+                List<Book>? lst;
+                if (widget.cat == 'fiction') {
+                  lst = bookprovider.fictionList;
+                } else if (widget.cat == 'action+adventure') {
+                  lst = bookprovider.actionAndAdventureList;
+                } else if (widget.cat == 'novel') {
+                  lst = bookprovider.novelList;
+                } else if (widget.cat == 'horror') {
+                  lst = bookprovider.horrorList;
+                } else {
+                  lst = bookprovider.animeAndMangaList;
+                }
 
-              return SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [...lst.map((book) => BookItem(book)).toList()],
-                  ));
-            }),
+                return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [...lst.map((book) => BookItem(book)).toList()],
+                    ));
+              }));
+  }
+}
+
+class ShimmerEffect extends StatelessWidget {
+  const ShimmerEffect({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: 270,
+      child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemBuilder: ((context, index) => Shimmer.fromColors(
+                // ignore: sort_child_properties_last
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(vertical: 2),
+                      margin: EdgeInsets.only(right: 15),
+                      height: 220,
+                      width: 160,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.all(Radius.circular(8))),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: Container(
+                          height: 15,
+                          width: 150,
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(4)))),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: Container(
+                        height: 15,
+                        width: 100,
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.all(Radius.circular(4))),
+                      ),
+                    )
+                  ],
+                ),
+                baseColor: Colors.grey[400]!,
+                highlightColor: Colors.grey[300]!,
+                enabled: true,
+              )),
+          itemCount: 3),
     );
   }
 }

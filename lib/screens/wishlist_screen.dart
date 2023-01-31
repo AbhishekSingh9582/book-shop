@@ -14,15 +14,6 @@ class WishlistScreen extends StatefulWidget {
 }
 
 class _WishlistScreenState extends State<WishlistScreen> {
-  // int i = 0;
-  // void createSection(String bookId) async {
-  //   Book book = await Provider.of<BookProvider>(context, listen: false)
-  //       .getBookDetail(bookId);
-  //   SingleBookItem(book, i++);
-  // }
-  //List<Book>? wishListBooks = [];
-  // @override
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,64 +57,8 @@ class _WishlistScreenState extends State<WishlistScreen> {
                         itemCount: lst.length,
                       );
               });
-              // if(snapshot.hasData){
-              // return snapshot.data!.isEmpty
-              //     ? Column(
-              //         mainAxisAlignment: MainAxisAlignment.center,
-              //         children: [
-              //           Text(
-              //             'Keep a list of books to read',
-              //             style: Theme.of(context).textTheme.headline3,
-              //           ),
-              //           const Text('\n'),
-              //           const Text(
-              //             "To add a book ,tap the wishlist icon in the book's details",
-              //             softWrap: true,
-              //           )
-              //         ],
-              //       )
-              //     : ListView.builder(
-              //         itemBuilder: (context, ind) =>
-              //             SingleBookItem(snapshot.data![ind], ind),
-              //         itemCount: snapshot.data!.length,
-              //       );
             }),
           ),
         ));
   }
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     appBar: AppBar(),
-  //     body: SingleChildScrollView(
-  //       child: Column(
-  //         children: [
-  //           StreamBuilder(
-  //               stream: FirebaseFirestore.instance
-  //                   .collection('users')
-  //                   .doc(user.uid)
-  //                   .collection('wishList')
-  //                   .doc()
-  //                   .snapshots(),
-  //               builder: (BuildContext context,
-  //                   AsyncSnapshot<DocumentSnapshot> snapshot) {
-  //                 if (snapshot.hasError) {
-  //                   return Text('Something is Wrong');
-  //                 }
-  //                 if (snapshot.connectionState == ConnectionState.waiting) {
-  //                   return const Center(child: CircularProgressIndicator());
-  //                 }
-  //                 if (snapshot.hasData) {
-  //                   var bookid = snapshot.data!.id;
-  //                   print(bookid);
-  //                   createSection(bookid);
-  //                 }
-
-  //                 return Text('Add into WishList');
-  //               }),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
 }
