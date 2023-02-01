@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:provider/provider.dart';
@@ -25,7 +24,7 @@ class _CategoryItemState extends State<CategoryItem> {
 
   Future _obtainBookFuture() async {
     return Provider.of<BookProvider>(context, listen: false)
-        .getBooks('${widget.cat}')
+        .getBooks(widget.cat)
         .catchError((error) {
       return showDialog(
           barrierDismissible: false,
@@ -55,11 +54,7 @@ class _CategoryItemState extends State<CategoryItem> {
         future: _bookFuture,
         builder: (context, snapshot) => snapshot.connectionState ==
                 ConnectionState.waiting
-            // ? Container(
-            //     width: 160,
-            //     height: 270,
-            //     child: Center(child: CircularProgressIndicator()))
-            ? ShimmerEffect()
+            ? const ShimmerEffect()
             : Consumer<BookProvider>(builder: (ctx, bookprovider, _) {
                 List<Book>? lst;
                 if (widget.cat == 'fiction') {
@@ -80,63 +75,6 @@ class _CategoryItemState extends State<CategoryItem> {
                       children: [...lst.map((book) => BookItem(book)).toList()],
                     ));
               }));
-  }
-}
-
-class ShimmerEffect extends StatelessWidget {
-  const ShimmerEffect({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      height: 270,
-      child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemBuilder: ((context, index) => Shimmer.fromColors(
-                // ignore: sort_child_properties_last
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.symmetric(vertical: 2),
-                      margin: EdgeInsets.only(right: 15),
-                      height: 220,
-                      width: 160,
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.all(Radius.circular(8))),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: Container(
-                          height: 15,
-                          width: 150,
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(4)))),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: Container(
-                        height: 15,
-                        width: 100,
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.all(Radius.circular(4))),
-                      ),
-                    )
-                  ],
-                ),
-                baseColor: Colors.grey[400]!,
-                highlightColor: Colors.grey[300]!,
-                enabled: true,
-              )),
-          itemCount: 3),
-    );
   }
 }
 
@@ -162,8 +100,8 @@ class BookItem extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(16.5),
                   child: FadeInImage(
-                    placeholder:
-                        AssetImage('assets/Images/book-cover-placeholder.png'),
+                    placeholder: const AssetImage(
+                        'assets/Images/book-cover-placeholder.png'),
                     image: NetworkImage(
                       book.imageLinks.toString(),
                     ),
@@ -174,12 +112,68 @@ class BookItem extends StatelessWidget {
             ),
             Text(
               '${book.title}',
-              style: TextTheme().headline2,
+              style: const TextTheme().headline2,
             ),
             Text('Rs ${Random().nextInt(500)}')
           ],
         ),
       ),
+    );
+  }
+}
+
+class ShimmerEffect extends StatelessWidget {
+  const ShimmerEffect({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      height: 270,
+      child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemBuilder: ((context, index) => Shimmer.fromColors(
+                baseColor: const Color.fromARGB(255, 221, 220, 220),
+                highlightColor: const Color.fromARGB(255, 234, 232, 232),
+                enabled: true,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 2),
+                      margin: const EdgeInsets.only(right: 18),
+                      height: 220,
+                      width: 160,
+                      decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.all(Radius.circular(8))),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: Container(
+                          height: 15,
+                          width: 150,
+                          decoration: const BoxDecoration(
+                              color: Colors.white,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(4)))),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: Container(
+                        height: 15,
+                        width: 100,
+                        decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.all(Radius.circular(4))),
+                      ),
+                    )
+                  ],
+                ),
+              )),
+          itemCount: 3),
     );
   }
 }

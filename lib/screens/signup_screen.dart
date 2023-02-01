@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:provider/provider.dart';
+import '../provider/user_Provider.dart';
 
 class SignUpScreen extends StatefulWidget {
   final VoidCallback onClickedSignUp;
@@ -12,15 +14,17 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _usernameController = TextEditingController();
   bool _isLoading = false;
   final formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
-    emailController.dispose();
-    passwordController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _usernameController.dispose();
     super.dispose();
   }
 
@@ -34,18 +38,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             const SizedBox(height: 65),
             TextFormField(
-              controller: emailController,
+              controller: _usernameController,
+              textInputAction: TextInputAction.next,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: ((name) => name == null ? 'Enter a username' : null),
+              decoration: const InputDecoration(labelText: 'Name'),
+            ),
+            TextFormField(
+              controller: _emailController,
               textInputAction: TextInputAction.next,
               autovalidateMode: AutovalidateMode.onUserInteraction,
               validator: (email) =>
-                  email != null && !EmailValidator.validate(email)
-                      ? 'Enter a valid email'
-                      : null,
+                  email != null && EmailValidator.validate(email)
+                      ? null
+                      : 'Enter a valid email',
               decoration: const InputDecoration(labelText: 'Email'),
             ),
             const SizedBox(height: 20),
             TextFormField(
-              controller: passwordController,
+              controller: _passwordController,
               textInputAction: TextInputAction.done,
               autovalidateMode: AutovalidateMode.onUserInteraction,
               validator: (password) => password != null && password.length < 6
@@ -67,17 +78,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       style: TextStyle(fontSize: 24),
                     ),
                   ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
             RichText(
                 text: TextSpan(
-                    style: TextStyle(color: Colors.black),
+                    style: const TextStyle(color: Colors.black),
                     text: 'Already have an Account?',
                     children: [
                   TextSpan(
                     recognizer: TapGestureRecognizer()
                       ..onTap = widget.onClickedSignUp,
                     text: 'Log In',
-                    style: TextStyle(
+                    style: const TextStyle(
                         decoration: TextDecoration.underline,
                         color: Colors.blue),
                   )
@@ -96,9 +107,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
       _isLoading = true;
     });
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: emailController.text.trim(),
-          password: passwordController.text.trim());
+      await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+              email: _emailController.text.trim(),
+              password: _passwordController.text.trim())
+          .then((value) {
+        Provider.of<UserProvider>(context, listen: false)
+            .createUser(_usernameController.text);
+      });
     } on FirebaseAuthException catch (e) {
       print(e);
     }

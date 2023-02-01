@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:book_app/provider/user_Provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -71,7 +71,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                                         fontSize: 29,
                                         fontWeight: FontWeight.bold),
                                   ),
-                                  Text(''),
+                                  const Text(''),
                                   Text('${tempBook.author}'),
                                   Text(
                                       'Published At ${tempBook.publishedDate}'),
@@ -82,7 +82,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                         ),
                       ),
                       const SizedBox(height: 18),
-                      Container(
+                      SizedBox(
                         height: 40,
                         width: MediaQuery.of(context).size.width,
                         child: Row(
@@ -104,7 +104,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                                 ],
                               ),
                             )),
-                            VerticalDivider(thickness: 1.5),
+                            const VerticalDivider(thickness: 1.5),
                             Expanded(
                                 child: Column(
                               children: const [
@@ -115,12 +115,12 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                                 Text('eBook')
                               ],
                             )),
-                            VerticalDivider(thickness: 1.5),
+                            const VerticalDivider(thickness: 1.5),
                             Expanded(
                                 child: Column(
                               children: [
                                 Text('${tempBook.pageCount}'),
-                                Text('Pages')
+                                const Text('Pages')
                               ],
                             ))
                           ],
@@ -153,48 +153,57 @@ class CreateWishListIcon extends StatefulWidget {
 }
 
 class _CreateWishListIconState extends State<CreateWishListIcon> {
-  @override
   bool? _isBookMarked = false;
   final user = FirebaseAuth.instance.currentUser!;
+  @override
   void initState() {
     checkBookMark();
     super.initState();
   }
 
   Future<void> checkBookMark() async {
-    DocumentSnapshot<Map<String, dynamic>> snapDoc = await FirebaseFirestore
-        .instance
-        .collection('users')
-        .doc(user.uid)
-        .collection('wishList')
-        .doc(widget.bookId)
-        .get();
-    if (snapDoc.exists) {
-      setState(() {
-        _isBookMarked = true;
-      });
-    } else {
-      setState(() {
-        _isBookMarked = false;
-      });
-    }
+    // DocumentSnapshot<Map<String, dynamic>> snapDoc = await FirebaseFirestore
+    //     .instance
+    //     .collection('users')
+    //     .doc(user.uid)
+    //     .collection('wishList')
+    //     .doc(widget.bookId)
+    //     .get();
+    // if (snapDoc.exists) {
+    //   setState(() {
+    //     _isBookMarked = true;
+    //   });
+    // } else {
+    //   setState(() {
+    //     _isBookMarked = false;
+    //   });
+    // }
+    bool bookMarked = await Provider.of<UserProvider>(context, listen: false)
+        .isBookMarked(widget.bookId);
+    setState(() {
+      _isBookMarked = bookMarked;
+    });
   }
 
   Future<void> changeBookMark() async {
     if (!_isBookMarked!) {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .collection('wishList')
-          .doc(widget.bookId)
-          .set({'boodId': widget.bookId});
+      // await FirebaseFirestore.instance
+      //     .collection('users')
+      //     .doc(user.uid)
+      //     .collection('wishList')
+      //     .doc(widget.bookId)
+      //     .set({'boodId': widget.bookId});
+      await Provider.of<UserProvider>(context, listen: false)
+          .addBookIntoWishList(widget.bookId);
     } else {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .collection('wishList')
-          .doc(widget.bookId)
-          .delete();
+      // await FirebaseFirestore.instance
+      //     .collection('users')
+      //     .doc(user.uid)
+      //     .collection('wishList')
+      //     .doc(widget.bookId)
+      //     .delete();
+      await Provider.of<UserProvider>(context, listen: false)
+          .removeBookFromWishList(widget.bookId);
     }
     setState(() {
       _isBookMarked = !_isBookMarked!;
@@ -206,8 +215,6 @@ class _CreateWishListIconState extends State<CreateWishListIcon> {
     return IconButton(
       onPressed: () async {
         await changeBookMark();
-        await Provider.of<BookProvider>(context, listen: false)
-            .getWishListBook();
       },
       icon: _isBookMarked!
           ? const Icon(Icons.bookmark_add)

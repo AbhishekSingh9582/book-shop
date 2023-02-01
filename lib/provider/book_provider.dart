@@ -7,8 +7,8 @@ import 'package:http/http.dart' as http;
 import '../model/book.dart';
 
 class BookProvider with ChangeNotifier {
-  //AIzaSyDnDv5TwYDU86WW-pNJ7aJcgi2pKc1YxuE
   final user = FirebaseAuth.instance.currentUser!;
+
   List<Book> _fictionCollection = [];
   List<Book> _wishListBooks = [];
   List<Book> _searchList = [];
@@ -82,12 +82,11 @@ class BookProvider with ChangeNotifier {
   }
 
   Future<void> getBooks(String cat) async {
-    //var apiKey = 'AIzaSyDnDv5TwYDU86WW-pNJ7aJcgi2pKc1YxuE';
     final url = Uri.parse(
         "https://www.googleapis.com/books/v1/volumes?q=$cat&maxResults=15");
     // final url = Uri.https("www.googleapis.com", "books/v1/volumes", {
     //   'q': 'Fiction',
-    //   'key': 'AIzaSyDnDv5TwYDU86WW-pNJ7aJcgi2pKc1YxuE',
+    //   'key': '',
     //   'maxResults': '40',
     // });
 
@@ -101,8 +100,6 @@ class BookProvider with ChangeNotifier {
         List<Book> tempList = [];
 
         result['items']!.forEach((book) {
-          //print(book['volumeInfo']['title']);
-
           if (book['volumeInfo'] != null) {
             Map<String, dynamic> volumeInfo = book['volumeInfo'] ?? {};
 
@@ -120,7 +117,6 @@ class BookProvider with ChangeNotifier {
                       .toList()
                   : [''],
               publishedDate: volumeInfo['publishedDate'],
-              //  mainCategory: book['mainCategory'],
               averageRating: volumeInfo['averageRating'] == null
                   ? '__'
                   : volumeInfo['averageRating'].toString(),
@@ -130,10 +126,8 @@ class BookProvider with ChangeNotifier {
               ratingCount: volumeInfo['ratingsCount'],
             ));
           }
-          // }
         });
 
-        //print('inside book provider ${tempList.length}');
         if (tempList.isNotEmpty) {
           if (cat == 'fiction') {
             _fictionCollection = tempList;
@@ -200,24 +194,24 @@ class BookProvider with ChangeNotifier {
     );
   }
 
-  Future<void> getWishListBook() async {
+  Future<void> getWishListBook(List<String> idList) async {
     List<Book>? tempwishList = [];
-    final querysnapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .collection('wishList')
-        .get();
+    // final querysnapshot = await FirebaseFirestore.instance
+    //     .collection('users')
+    //     .doc(user.uid)
+    //     .collection('wishList')
+    //     .get();
 
-    for (var docSnap in querysnapshot.docs) {
+    for (var docSnap in idList) {
       // Book book = await Provider.of<BookProvider>(context, listen: false)
       //     .getBookDetail(docSnap.id);
-      Book book = await getBookDetail(docSnap.id);
+      Book book = await getBookDetail(docSnap);
       //print(docSnap.id);
       tempwishList.add(book);
     }
 
     _wishListBooks = tempwishList;
-    notifyListeners();
+    // notifyListeners();
     //return wishListBooks;
   }
 
@@ -234,7 +228,7 @@ class BookProvider with ChangeNotifier {
     final response = await http.get(url);
 
     try {
-      print(json.decode(response.body));
+      //print(json.decode(response.body));
       Map<String, dynamic> result =
           json.decode(response.body) as Map<String, dynamic>;
 
@@ -259,7 +253,6 @@ class BookProvider with ChangeNotifier {
                       .toList()
                   : [''],
               publishedDate: volumeInfo['publishedDate'],
-              //  mainCategory: book['mainCategory'],
               averageRating: volumeInfo['averageRating'] == null
                   ? '__'
                   : volumeInfo['averageRating'].toString(),
@@ -269,18 +262,13 @@ class BookProvider with ChangeNotifier {
               ratingCount: volumeInfo['ratingsCount'],
             ));
           }
-          // }
         });
         _searchList = tempList;
-        //print('inside book provider ${tempList.length}');
-        //notifyListeners();
       } else {
         print('1 page book_provider ${result['error']}');
       }
-      //return tempList;
     } catch (e) {
       print('2 error Occured in book_provider $e');
-      //return tempList;
     }
   }
 }

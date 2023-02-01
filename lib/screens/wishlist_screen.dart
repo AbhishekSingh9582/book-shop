@@ -1,5 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:book_app/provider/user_Provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../provider/book_provider.dart';
@@ -16,15 +15,17 @@ class WishlistScreen extends StatefulWidget {
 class _WishlistScreenState extends State<WishlistScreen> {
   @override
   Widget build(BuildContext context) {
+    List<String> idList = Provider.of<UserProvider>(context).getWishList;
+
     return Scaffold(
         appBar: AppBar(
-          title: Text('WishList'),
+          title: const Text('WishList'),
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: FutureBuilder(
             future: Provider.of<BookProvider>(context, listen: false)
-                .getWishListBook(), //getWishListBook(),
+                .getWishListBook(idList),
             builder: ((context, snapshot) {
               if (snapshot.hasError) return const Text('Something went wrong');
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -32,31 +33,29 @@ class _WishlistScreenState extends State<WishlistScreen> {
                   child: CircularProgressIndicator(),
                 );
               }
+              List<Book> lst = [];
 
-              return Consumer<BookProvider>(builder: (ctx, bookProvider, _) {
-                List<Book> lst = [];
-                lst = bookProvider.wishList;
-                return lst.isEmpty
-                    ? Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Keep a list of books to read',
-                            style: Theme.of(context).textTheme.headline3,
-                          ),
-                          const Text('\n'),
-                          const Text(
-                            "To add a book ,tap the wishlist icon in the book's details",
-                            softWrap: true,
-                          )
-                        ],
-                      )
-                    : ListView.builder(
-                        itemBuilder: (context, ind) =>
-                            SingleBookItem(lst[ind], ind),
-                        itemCount: lst.length,
-                      );
-              });
+              lst = Provider.of<BookProvider>(context, listen: false).wishList;
+              return lst.isEmpty
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Keep a list of books to read',
+                          style: Theme.of(context).textTheme.headline3,
+                        ),
+                        const Text('\n'),
+                        const Text(
+                          "To add a book ,tap the wishlist icon in the book's details",
+                          softWrap: true,
+                        )
+                      ],
+                    )
+                  : ListView.builder(
+                      itemBuilder: (context, ind) =>
+                          SingleBookItem(lst[ind], ind),
+                      itemCount: lst.length,
+                    );
             }),
           ),
         ));

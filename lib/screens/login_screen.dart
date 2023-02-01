@@ -1,8 +1,10 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
+import '../model/user.dart';
+
+Users? loginUser = Users();
 
 class LoginScreen extends StatefulWidget {
   final VoidCallback onClickedSignUp;
@@ -17,6 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final passwordController = TextEditingController();
   bool _isLoading = false;
   final formKey = GlobalKey<FormState>();
+
   @override
   void dispose() {
     emailController.dispose();
@@ -102,9 +105,13 @@ class _LoginScreenState extends State<LoginScreen> {
       _isLoading = true;
     });
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: emailController.text.trim(),
-          password: passwordController.text.trim());
+      await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+              email: emailController.text.trim(),
+              password: passwordController.text.trim())
+          .then((value) {
+        //Provider.of<UserProvider>(context, listen: false).getLoginUser();
+      });
     } on FirebaseAuthException catch (e) {
       print(e);
     }

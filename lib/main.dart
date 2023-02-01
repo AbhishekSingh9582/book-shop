@@ -1,3 +1,4 @@
+import 'package:book_app/provider/user_Provider.dart';
 import 'package:book_app/screens/login_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -21,6 +22,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (context) => UserProvider()),
         ChangeNotifierProvider(create: (ctx) => BookProvider()),
       ],
       child: MaterialApp(
@@ -29,7 +31,6 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
             primarySwatch: Colors.blue,
             textTheme: const TextTheme(
-              //titleMedium: TextStyle(fontSize: 24, fontWeight: FontWeight.w800),
               headline1: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
               headline2: TextStyle(
                   fontSize: 17,

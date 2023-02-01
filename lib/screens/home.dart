@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../provider/book_provider.dart';
 import 'package:provider/provider.dart';
 import 'home_screen.dart';
+import '../provider/user_Provider.dart';
 import 'category_screen.dart';
 import 'wishlist_screen.dart';
 
@@ -15,6 +16,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int currentIndex = 0;
+  @override
+  void initState() {
+    Provider.of<UserProvider>(context, listen: false).getLoginUser();
+    super.initState();
+  }
+
   final screens = [
     HomeScreen(),
     CategoryScreen(),
@@ -22,7 +29,6 @@ class _HomePageState extends State<HomePage> {
   ];
   @override
   Widget build(BuildContext context) {
-    // Provider.of<BookProvider>(context, listen: false).getBooks();
     return Scaffold(
       extendBodyBehindAppBar: true,
       body: screens[currentIndex],
