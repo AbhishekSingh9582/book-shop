@@ -9,7 +9,7 @@ class Comment {
   Comment.fromJson(Map<String, dynamic> json) {
     username = json['username'];
     text = json['text'];
-    createdAt = json['createAt'];
+    createdAt = json['createdAt'].toDate();
     star = json['star'];
   }
 

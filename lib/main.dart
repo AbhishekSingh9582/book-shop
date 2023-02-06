@@ -31,13 +31,17 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
             primarySwatch: Colors.blue,
             textTheme: const TextTheme(
-              headline1: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+              headline1: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
               headline2: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w900,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
                   color: Colors.black),
-              headline3: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
+              headline3: TextStyle(
+                  fontSize: 21,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.black),
             ),
+            //iconTheme: IconThemeData(color: Colors.orange),
             appBarTheme: const AppBarTheme(
                 color: Colors.white,
                 shape: Border(
