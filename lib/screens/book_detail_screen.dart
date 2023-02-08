@@ -4,11 +4,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:book_app/provider/user_Provider.dart';
+//import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import '../model/book.dart';
 import '../provider/book_provider.dart';
 import '../model/comment.dart';
-import '../provider/user_Provider.dart';
 import '../model/user.dart';
+import 'edit_add_comment.dart';
 
 class BookDetailScreen extends StatefulWidget {
   String? bookId;
@@ -20,8 +21,9 @@ class BookDetailScreen extends StatefulWidget {
 
 class _BookDetailScreenState extends State<BookDetailScreen> {
   List<Comment> _commentList = [];
-  bool _curUserComment = false;
+  bool curUserComment = false;
   Users? loginUser;
+  Comment? comment;
 
   @override
   void initState() {
@@ -30,22 +32,43 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
   }
 
   Future<void> getData() async {
-    loginUser =
-        await Provider.of<UserProvider>(context, listen: false).loginUser;
+    loginUser = Provider.of<UserProvider>(context, listen: false).loginUser;
 
-    final querySnaphot = await FirebaseFirestore.instance
+    await FirebaseFirestore.instance
         .collection('comments')
         .doc(widget.bookId)
         .collection('users')
-        .get();
-
-    for (var docsnap in querySnaphot.docs) {
-      var data = docsnap.data();
-      if (docsnap.id == loginUser!.id) {
-        _curUserComment = true;
+        .doc(loginUser!.id)
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      if (documentSnapshot.exists) {
+        final data = documentSnapshot.data() as Map<String, dynamic>;
+        curUserComment = true;
+        comment = Comment.fromJson(data);
+      } else {
+        curUserComment = false;
+        comment = Comment(
+            uid: loginUser!.id,
+            text: '',
+            bookId: widget.bookId,
+            createdAt: DateTime.now(),
+            star: 0,
+            username: loginUser!.name);
       }
-      _commentList.add(Comment.fromJson(data));
-    }
+    });
+    // final querySnaphot = await FirebaseFirestore.instance
+    //     .collection('comments')
+    //     .doc(widget.bookId)
+    //     .collection('users')
+    //     .get();
+
+    // for (var docsnap in querySnaphot.docs) {
+    //   var data = docsnap.data();
+    //   if (docsnap.id == loginUser!.id) {
+    //     _curUserComment = true;
+    //   }
+    //   _commentList.add(Comment.fromJson(data));
+    // }
   }
 
   @override
@@ -176,159 +199,343 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                         child: Text('Reviews and Ratings',
                             style: Theme.of(context).textTheme.headline3),
                       ),
-
-                      Column(
-                        children: [
-                          ..._commentList
-                              .map((commentData) => Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Flexible(child: CircleAvatar()),
-                                      Flexible(
-                                          flex: 4,
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 8.0,
-                                                right: 8,
-                                                bottom: 12,
-                                                top: 3),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  '${commentData.username}',
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .headline2,
-                                                ),
-                                                FittedBox(
-                                                  child: Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: [
-                                                      ...List.generate(
-                                                          5,
-                                                          (index) => Icon(
-                                                                index <
-                                                                        commentData
-                                                                            .star!
-                                                                    ? Icons.star
-                                                                    : Icons
-                                                                        .star_border_outlined,
-                                                                size: 18.5,
-                                                                color: Colors
-                                                                    .orange,
-                                                              )),
-                                                      SizedBox(width: 13),
-                                                      Text(
-                                                          '${DateFormat.yMMMEd().format(commentData.createdAt!)}'),
-                                                    ],
-                                                  ),
-                                                ),
-                                                Text(
-                                                  '${commentData.text}',
-                                                  softWrap: true,
-                                                ),
-                                              ],
-                                            ),
-                                          ))
-                                    ],
-                                  ))
-                              .toList()
-                        ],
-                      )
-
-                      // StreamBuilder<QuerySnapshot>(
-                      //     stream: FirebaseFirestore.instance
-                      //         .collection('comments')
-                      //         .doc(widget.bookId)
-                      //         .collection('users')
-                      //         .snapshots(),
-                      //     builder: ((context,
-                      //         AsyncSnapshot<QuerySnapshot> snapshot) {
-                      //       if (snapshot.hasError) {
-                      //         return const Text('Something is wrong');
-                      //       }
-                      //       if (ConnectionState.waiting ==
-                      //           snapshot.connectionState) {
-                      //         return const Center(
-                      //             child: CircularProgressIndicator());
-                      //       }
-
-                      //       if (snapshot.hasData) {
-                      //         return Column(children: [
-                      //           ...snapshot.data!.docs
-                      //               .map((commentData) => Row(
-                      //                     crossAxisAlignment:
-                      //                         CrossAxisAlignment.start,
-                      //                     children: [
-                      //                       Flexible(child: CircleAvatar()),
-                      //                       Flexible(
-                      //                           flex: 4,
-                      //                           child: Padding(
-                      //                             padding:
-                      //                                 const EdgeInsets.only(
-                      //                                     left: 8.0,
-                      //                                     right: 8,
-                      //                                     bottom: 12,
-                      //                                     top: 3),
-                      //                             child: Column(
-                      //                               crossAxisAlignment:
-                      //                                   CrossAxisAlignment
-                      //                                       .start,
+                      CurrentUserCommentSection(
+                          widget.bookId, curUserComment, comment, loginUser),
+                      // Column(
+                      //   children: [
+                      //     ..._commentList
+                      //         .map((commentData) => Row(
+                      //               crossAxisAlignment:
+                      //                   CrossAxisAlignment.start,
+                      //               children: [
+                      //                 Flexible(child: CircleAvatar()),
+                      //                 Flexible(
+                      //                     flex: 4,
+                      //                     child: Padding(
+                      //                       padding: const EdgeInsets.only(
+                      //                           left: 8.0,
+                      //                           right: 8,
+                      //                           bottom: 12,
+                      //                           top: 3),
+                      //                       child: Column(
+                      //                         crossAxisAlignment:
+                      //                             CrossAxisAlignment.start,
+                      //                         children: [
+                      //                           Text(
+                      //                             '${commentData.username}',
+                      //                             style: Theme.of(context)
+                      //                                 .textTheme
+                      //                                 .headline2,
+                      //                           ),
+                      //                           FittedBox(
+                      //                             child: Row(
+                      //                               mainAxisSize:
+                      //                                   MainAxisSize.min,
                       //                               children: [
+                      //                                 ...List.generate(
+                      //                                     5,
+                      //                                     (index) => Icon(
+                      //                                           index <
+                      //                                                   commentData
+                      //                                                       .star!
+                      //                                               ? Icons.star
+                      //                                               : Icons
+                      //                                                   .star_border_outlined,
+                      //                                           size: 18.5,
+                      //                                           color: Colors
+                      //                                               .orange,
+                      //                                         )),
+                      //                                 SizedBox(width: 13),
                       //                                 Text(
-                      //                                   '${commentData['username']}',
-                      //                                   style: Theme.of(context)
-                      //                                       .textTheme
-                      //                                       .headline2,
-                      //                                 ),
-                      //                                 FittedBox(
-                      //                                   child: Row(
-                      //                                     mainAxisSize:
-                      //                                         MainAxisSize.min,
-                      //                                     children: [
-                      //                                       ...List.generate(
-                      //                                           5,
-                      //                                           (index) => Icon(
-                      //                                                 index < commentData['star']
-                      //                                                     ? Icons
-                      //                                                         .star
-                      //                                                     : Icons
-                      //                                                         .star_border_outlined,
-                      //                                                 size:
-                      //                                                     18.5,
-                      //                                                 color: Colors
-                      //                                                     .orange,
-                      //                                               )),
-                      //                                       SizedBox(width: 13),
-                      //                                       Text(
-                      //                                           '${DateFormat.yMMMEd().format(commentData['createdAt'].toDate())}')
-                      //                                     ],
-                      //                                   ),
-                      //                                 ),
-                      //                                 Text(
-                      //                                   '${commentData['text']}',
-                      //                                   softWrap: true,
-                      //                                 ),
+                      //                                     '${DateFormat.yMMMEd().format(commentData.createdAt!)}'),
                       //                               ],
                       //                             ),
-                      //                           ))
-                      //                     ],
-                      //                   ))
-                      //               .toList()
-                      //         ]);
-                      //       }
-                      //       return SizedBox();
-                      //     }))
+                      //                           ),
+                      //                           Text(
+                      //                             '${commentData.text}',
+                      //                             softWrap: true,
+                      //                           ),
+                      //                         ],
+                      //                       ),
+                      //                     ))
+                      //               ],
+                      //             ))
+                      //         .toList()
+                      //   ],
+                      // )
+
+                      StreamBuilder<QuerySnapshot>(
+                          stream: FirebaseFirestore.instance
+                              .collection('comments')
+                              .doc(widget.bookId)
+                              .collection('users')
+                              .snapshots(),
+                          builder: ((context,
+                              AsyncSnapshot<QuerySnapshot> snapshot) {
+                            if (snapshot.hasError) {
+                              return const Text('Something is wrong');
+                            }
+                            if (ConnectionState.waiting ==
+                                snapshot.connectionState) {
+                              return const Center(
+                                  child: CircularProgressIndicator());
+                            }
+
+                            if (snapshot.hasData) {
+                              return Column(children: [
+                                ...snapshot.data!.docs.map((commentData) {
+                                  final comment = commentData.data()
+                                      as Map<String, dynamic>;
+                                  if (comment['userId'] == loginUser!.id) {
+                                    return Container();
+                                  }
+                                  return CommentWidget(
+                                      Comment.fromJson(comment));
+                                }).toList()
+                              ]);
+                            }
+                            return const SizedBox();
+                          }))
                     ],
                   ),
                 ),
               );
             }
           }),
+    );
+  }
+}
+
+class CurrentUserCommentSection extends StatefulWidget {
+  String? bookId;
+  bool curUserComment;
+  Comment? comment;
+  Users? loginUser;
+  CurrentUserCommentSection(
+      this.bookId, this.curUserComment, this.comment, this.loginUser,
+      {super.key});
+
+  @override
+  State<CurrentUserCommentSection> createState() =>
+      _CurrentUserCommentSectionState();
+}
+
+class _CurrentUserCommentSectionState extends State<CurrentUserCommentSection> {
+  //int _initialRating = 0;
+  Future<void> submitReviewChanges() async {
+    if (widget.curUserComment == true) {
+      await FirebaseFirestore.instance
+          .collection('comments')
+          .doc(widget.comment!.bookId)
+          .collection('users')
+          .doc(widget.comment!.uid)
+          .update({
+        'createdAt': widget.comment!.createdAt,
+        'star': widget.comment!.star,
+        'text': widget.comment!.text,
+      }).then((value) {
+        setState(() {
+          widget.curUserComment = true;
+          //_initialRating = 0;
+        });
+      });
+    } else {
+      await FirebaseFirestore.instance
+          .collection('comments')
+          .doc(widget.comment!.bookId)
+          .collection('users')
+          .doc(widget.comment!.uid)
+          .set(Comment(
+            createdAt: DateTime.now(),
+            uid: widget.comment!.uid,
+            star: widget.comment!.star,
+            text: widget.comment!.text,
+            bookId: widget.comment!.bookId,
+            username: widget.comment!.username,
+          ).toJson())
+          .then((value) {
+        setState(() {
+          widget.curUserComment = true;
+          // _initialRating = 0;
+        });
+      });
+    }
+  }
+
+  Future<void> deleteComment() async {
+    await FirebaseFirestore.instance
+        .collection('comments')
+        .doc(widget.comment!.bookId)
+        .collection('users')
+        .doc(widget.comment!.uid)
+        .delete()
+        .then((value) {
+      setState(() {
+        widget.curUserComment = false;
+        widget.comment!.star = 0;
+        widget.comment!.text = '';
+        widget.comment!.createdAt = DateTime.now();
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.curUserComment
+        ? Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(10),
+                child: Divider(thickness: 1.5),
+              ),
+              const Text(
+                'Your Review',
+                style: TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 2.5),
+              CommentWidget(widget.comment!),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  OutlinedButton(
+                    onPressed: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                            builder: (context) => EditAddComment(
+                                true, widget.comment, submitReviewChanges))),
+                    style:
+                        OutlinedButton.styleFrom(shape: const StadiumBorder()),
+                    child: const Text('Edit Review'),
+                  ),
+                  OutlinedButton(
+                    onPressed: deleteComment,
+                    style:
+                        OutlinedButton.styleFrom(shape: const StadiumBorder()),
+                    child: const Text('Delete'),
+                  ),
+                ],
+              ),
+              const Padding(
+                padding: EdgeInsets.all(10),
+                child: Divider(thickness: 1.5),
+              ),
+              const SizedBox(height: 15),
+            ],
+          )
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.only(left: 10, right: 10, bottom: 10),
+                child: Divider(thickness: 1.5),
+              ),
+              const Text(
+                'Rate this eBook',
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+              ),
+              const Text('Tell others what you think'),
+              const SizedBox(height: 2.5),
+              // RatingBar.builder(
+              //   initialRating: _initialRating.toDouble(),
+              //   minRating: 1,
+              //   direction: Axis.horizontal,
+              //   allowHalfRating: false,
+              //   itemCount: 5,
+              //   itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
+              //   itemBuilder: (context, _) => const Icon(
+              //     Icons.star,
+              //     color: Colors.amber,
+              //   ),
+              //   onRatingUpdate: (rating) {
+              //     _initialRating = rating.toInt();
+
+              //     Navigator.of(context)
+              //         .push(MaterialPageRoute(builder: (context) {
+              //       widget.comment!.star = rating.toInt();
+
+              //       return EditAddComment(
+              //           false, widget.comment, submitReviewChanges);
+              //     })).then((value) {
+              //       setState(() {
+              //         _initialRating = 0;
+              //         widget.comment!.star = 0;
+              //       });
+              //     });
+              //     //_initialRating = 0;
+              //     // widget.comment!.star = 0;
+              //   },
+              // ),
+              const SizedBox(
+                height: 10,
+              ),
+              OutlinedButton(
+                onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => EditAddComment(
+                        false, widget.comment, submitReviewChanges))),
+                style: OutlinedButton.styleFrom(shape: const StadiumBorder()),
+                child: const Text('Write a review'),
+              ),
+              const Padding(
+                padding: EdgeInsets.all(10),
+                child: Divider(thickness: 1.5),
+              ),
+              const SizedBox(height: 15),
+            ],
+          );
+  }
+}
+
+class CommentWidget extends StatelessWidget {
+  Comment commentData;
+  CommentWidget(
+    this.commentData, {
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Flexible(child: CircleAvatar()),
+        Flexible(
+            flex: 4,
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  left: 8.0, right: 8, bottom: 12, top: 3),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${commentData.username}',
+                    style: Theme.of(context).textTheme.headline2,
+                  ),
+                  FittedBox(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ...List.generate(
+                            5,
+                            (index) => Icon(
+                                  index < commentData.star!
+                                      ? Icons.star
+                                      : Icons.star_border_outlined,
+                                  size: 18.5,
+                                  color: Colors.orange,
+                                )),
+                        const SizedBox(width: 13),
+                        Text(DateFormat.yMMMEd().format(commentData.createdAt!))
+                      ],
+                    ),
+                  ),
+                  Text(
+                    '${commentData.text}',
+                    softWrap: true,
+                  ),
+                ],
+              ),
+            ))
+      ],
     );
   }
 }
@@ -352,23 +559,7 @@ class _CreateWishListIconState extends State<CreateWishListIcon> {
   }
 
   Future<void> checkBookMark() async {
-    // DocumentSnapshot<Map<String, dynamic>> snapDoc = await FirebaseFirestore
-    //     .instance
-    //     .collection('users')
-    //     .doc(user.uid)
-    //     .collection('wishList')
-    //     .doc(widget.bookId)
-    //     .get();
-    // if (snapDoc.exists) {
-    //   setState(() {
-    //     _isBookMarked = true;
-    //   });
-    // } else {
-    //   setState(() {
-    //     _isBookMarked = false;
-    //   });
-    // }
-    bool bookMarked = await Provider.of<UserProvider>(context, listen: false)
+    bool bookMarked = Provider.of<UserProvider>(context, listen: false)
         .isBookMarked(widget.bookId);
     setState(() {
       _isBookMarked = bookMarked;
@@ -377,21 +568,9 @@ class _CreateWishListIconState extends State<CreateWishListIcon> {
 
   Future<void> changeBookMark() async {
     if (!_isBookMarked!) {
-      // await FirebaseFirestore.instance
-      //     .collection('users')
-      //     .doc(user.uid)
-      //     .collection('wishList')
-      //     .doc(widget.bookId)
-      //     .set({'boodId': widget.bookId});
       await Provider.of<UserProvider>(context, listen: false)
           .addBookIntoWishList(widget.bookId);
     } else {
-      // await FirebaseFirestore.instance
-      //     .collection('users')
-      //     .doc(user.uid)
-      //     .collection('wishList')
-      //     .doc(widget.bookId)
-      //     .delete();
       await Provider.of<UserProvider>(context, listen: false)
           .removeBookFromWishList(widget.bookId);
     }

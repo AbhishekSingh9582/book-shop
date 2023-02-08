@@ -41,11 +41,9 @@ class MyApp extends StatelessWidget {
                   fontWeight: FontWeight.w800,
                   color: Colors.black),
             ),
-            //iconTheme: IconThemeData(color: Colors.orange),
             appBarTheme: const AppBarTheme(
-                color: Colors.white,
-                shape: Border(
-                    bottom: BorderSide(color: Color.fromARGB(255, 69, 66, 66))),
+                elevation: 0,
+                backgroundColor: Colors.transparent,
                 titleTextStyle: TextStyle(
                     color: Colors.black,
                     fontSize: 20,

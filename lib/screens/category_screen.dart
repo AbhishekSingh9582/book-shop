@@ -22,13 +22,8 @@ class CategoryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
         elevation: 0,
         title: const Text('Genres'),
-        shape: const Border(
-          bottom: BorderSide(color: Color.fromARGB(96, 44, 41, 41), width: 0.6),
-          //borderRadius: BorderRadius.only(bottom:Radius.circular(4)),
-        ),
         actions: [
           IconButton(
               onPressed: () => Navigator.of(context).push(
@@ -50,8 +45,6 @@ class CategoryScreen extends StatelessWidget {
                       onTap: () => Navigator.of(context).pushNamed(
                           SingleCategoryPage.routeArgs,
                           arguments: topic),
-                      // style: TextButton.styleFrom(
-                      //     padding: const EdgeInsets.symmetric(vertical: 10)),
                       child: Padding(
                         padding: const EdgeInsets.all(10.0),
                         child: SizedBox(
