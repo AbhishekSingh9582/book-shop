@@ -4,7 +4,7 @@ class Book {
   List<String>? author;
   String? publishedDate;
   int? pageCount;
-  //String? mainCategory;
+
   String? averageRating;
   String? imageLinks;
   String? description;
@@ -17,7 +17,6 @@ class Book {
     this.author,
     this.publishedDate,
     this.pageCount,
-    // this.mainCategory = '',
     this.averageRating,
     this.imageLinks = '',
     this.description,

@@ -92,7 +92,6 @@ class BookProvider with ChangeNotifier {
 
     try {
       final response = await http.get(url);
-      //print(json.decode(response.body));
       Map<String, dynamic> result =
           json.decode(response.body) as Map<String, dynamic>;
 
@@ -196,23 +195,13 @@ class BookProvider with ChangeNotifier {
 
   Future<void> getWishListBook(List<String> idList) async {
     List<Book>? tempwishList = [];
-    // final querysnapshot = await FirebaseFirestore.instance
-    //     .collection('users')
-    //     .doc(user.uid)
-    //     .collection('wishList')
-    //     .get();
 
     for (var docSnap in idList) {
-      // Book book = await Provider.of<BookProvider>(context, listen: false)
-      //     .getBookDetail(docSnap.id);
       Book book = await getBookDetail(docSnap);
-      //print(docSnap.id);
       tempwishList.add(book);
     }
 
     _wishListBooks = tempwishList;
-    // notifyListeners();
-    //return wishListBooks;
   }
 
   Future<void> getSearchList(String? search) async {
@@ -228,13 +217,11 @@ class BookProvider with ChangeNotifier {
     final response = await http.get(url);
 
     try {
-      //print(json.decode(response.body));
       Map<String, dynamic> result =
           json.decode(response.body) as Map<String, dynamic>;
 
       if (!result.containsKey('error')) {
         result['items']!.forEach((book) {
-          print(book['volumeInfo']['title']);
 
           if (book['volumeInfo'] != null) {
             Map<String, dynamic> volumeInfo = book['volumeInfo'] ?? {};

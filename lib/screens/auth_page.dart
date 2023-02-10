@@ -1,7 +1,6 @@
 import 'package:book_app/screens/login_screen.dart';
 import 'package:book_app/screens/signup_screen.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter/material.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});

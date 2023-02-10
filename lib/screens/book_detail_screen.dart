@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:book_app/provider/user_Provider.dart';
-//import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import '../model/book.dart';
 import '../provider/book_provider.dart';
 import '../model/comment.dart';
@@ -56,19 +55,6 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
             username: loginUser!.name);
       }
     });
-    // final querySnaphot = await FirebaseFirestore.instance
-    //     .collection('comments')
-    //     .doc(widget.bookId)
-    //     .collection('users')
-    //     .get();
-
-    // for (var docsnap in querySnaphot.docs) {
-    //   var data = docsnap.data();
-    //   if (docsnap.id == loginUser!.id) {
-    //     _curUserComment = true;
-    //   }
-    //   _commentList.add(Comment.fromJson(data));
-    // }
   }
 
   @override
@@ -201,68 +187,6 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                       ),
                       CurrentUserCommentSection(
                           widget.bookId, curUserComment, comment, loginUser),
-                      // Column(
-                      //   children: [
-                      //     ..._commentList
-                      //         .map((commentData) => Row(
-                      //               crossAxisAlignment:
-                      //                   CrossAxisAlignment.start,
-                      //               children: [
-                      //                 Flexible(child: CircleAvatar()),
-                      //                 Flexible(
-                      //                     flex: 4,
-                      //                     child: Padding(
-                      //                       padding: const EdgeInsets.only(
-                      //                           left: 8.0,
-                      //                           right: 8,
-                      //                           bottom: 12,
-                      //                           top: 3),
-                      //                       child: Column(
-                      //                         crossAxisAlignment:
-                      //                             CrossAxisAlignment.start,
-                      //                         children: [
-                      //                           Text(
-                      //                             '${commentData.username}',
-                      //                             style: Theme.of(context)
-                      //                                 .textTheme
-                      //                                 .headline2,
-                      //                           ),
-                      //                           FittedBox(
-                      //                             child: Row(
-                      //                               mainAxisSize:
-                      //                                   MainAxisSize.min,
-                      //                               children: [
-                      //                                 ...List.generate(
-                      //                                     5,
-                      //                                     (index) => Icon(
-                      //                                           index <
-                      //                                                   commentData
-                      //                                                       .star!
-                      //                                               ? Icons.star
-                      //                                               : Icons
-                      //                                                   .star_border_outlined,
-                      //                                           size: 18.5,
-                      //                                           color: Colors
-                      //                                               .orange,
-                      //                                         )),
-                      //                                 SizedBox(width: 13),
-                      //                                 Text(
-                      //                                     '${DateFormat.yMMMEd().format(commentData.createdAt!)}'),
-                      //                               ],
-                      //                             ),
-                      //                           ),
-                      //                           Text(
-                      //                             '${commentData.text}',
-                      //                             softWrap: true,
-                      //                           ),
-                      //                         ],
-                      //                       ),
-                      //                     ))
-                      //               ],
-                      //             ))
-                      //         .toList()
-                      //   ],
-                      // )
 
                       StreamBuilder<QuerySnapshot>(
                           stream: FirebaseFirestore.instance
@@ -295,7 +219,8 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                               ]);
                             }
                             return const SizedBox();
-                          }))
+                          })),
+                      SizedBox(height: 25),
                     ],
                   ),
                 ),
@@ -321,7 +246,7 @@ class CurrentUserCommentSection extends StatefulWidget {
 }
 
 class _CurrentUserCommentSectionState extends State<CurrentUserCommentSection> {
-  //int _initialRating = 0;
+
   Future<void> submitReviewChanges() async {
     if (widget.curUserComment == true) {
       await FirebaseFirestore.instance
@@ -336,7 +261,7 @@ class _CurrentUserCommentSectionState extends State<CurrentUserCommentSection> {
       }).then((value) {
         setState(() {
           widget.curUserComment = true;
-          //_initialRating = 0;
+          
         });
       });
     } else {
@@ -356,7 +281,7 @@ class _CurrentUserCommentSectionState extends State<CurrentUserCommentSection> {
           .then((value) {
         setState(() {
           widget.curUserComment = true;
-          // _initialRating = 0;
+          
         });
       });
     }
@@ -435,36 +360,6 @@ class _CurrentUserCommentSectionState extends State<CurrentUserCommentSection> {
               ),
               const Text('Tell others what you think'),
               const SizedBox(height: 2.5),
-              // RatingBar.builder(
-              //   initialRating: _initialRating.toDouble(),
-              //   minRating: 1,
-              //   direction: Axis.horizontal,
-              //   allowHalfRating: false,
-              //   itemCount: 5,
-              //   itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
-              //   itemBuilder: (context, _) => const Icon(
-              //     Icons.star,
-              //     color: Colors.amber,
-              //   ),
-              //   onRatingUpdate: (rating) {
-              //     _initialRating = rating.toInt();
-
-              //     Navigator.of(context)
-              //         .push(MaterialPageRoute(builder: (context) {
-              //       widget.comment!.star = rating.toInt();
-
-              //       return EditAddComment(
-              //           false, widget.comment, submitReviewChanges);
-              //     })).then((value) {
-              //       setState(() {
-              //         _initialRating = 0;
-              //         widget.comment!.star = 0;
-              //       });
-              //     });
-              //     //_initialRating = 0;
-              //     // widget.comment!.star = 0;
-              //   },
-              // ),
               const SizedBox(
                 height: 10,
               ),
@@ -497,7 +392,7 @@ class CommentWidget extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Flexible(child: CircleAvatar()),
+        const Flexible(child: CircleAvatar(backgroundImage: AssetImage('assets/Images/empty-profile.png'),)),
         Flexible(
             flex: 4,
             child: Padding(

@@ -35,7 +35,7 @@ class _SearchScreenState extends State<SearchScreen> {
               Provider.of<BookProvider>(context, listen: false)
                   .getSearchList('');
             },
-            icon: Icon(Icons.arrow_back),
+            icon:const Icon(Icons.arrow_back),
           ),
           automaticallyImplyLeading: false,
           title: TextField(
@@ -86,22 +86,6 @@ class _SearchScreenState extends State<SearchScreen> {
                             ),
                           ),
                         )),
-                    // child: Consumer<BookProvider>(
-                    //   builder: ((context, value, child) {
-                    //     List<Book> books = [];
-                    //     books = value.searchList;
-                    //     return books.isEmpty
-                    //         ? Container()
-                    //         : ListView.builder(
-                    //             itemCount: books.length,
-                    //             itemBuilder: ((context, index) => ListTile(
-                    //                   title: Text(
-                    //                     '${books[index].title}',
-                    //                     style: TextStyle(color: Colors.black),
-                    //                   ),
-                    //                 )));
-                    //   }),
-                    // ),
                   )));
   }
 }

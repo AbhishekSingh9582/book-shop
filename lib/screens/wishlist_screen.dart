@@ -83,7 +83,7 @@ class WishlistShimmerEffect extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
-                        padding: EdgeInsets.all(15),
+                        padding:const EdgeInsets.all(15),
                         height: 170,
                         width: 125,
                         decoration: const BoxDecoration(
@@ -97,14 +97,14 @@ class WishlistShimmerEffect extends StatelessWidget {
                           children: [
                             Container(
                                 height: 16,
-                                margin: EdgeInsets.all(5),
+                                margin:const EdgeInsets.all(5),
                                 decoration: const BoxDecoration(
                                     color: Colors.white,
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(4)))),
                             Container(
                                 height: 12,
-                                margin: EdgeInsets.all(5),
+                                margin:const EdgeInsets.all(5),
                                 decoration: const BoxDecoration(
                                     color: Colors.white,
                                     borderRadius:
@@ -112,7 +112,7 @@ class WishlistShimmerEffect extends StatelessWidget {
                             Container(
                                 height: 12,
                                 width: 40,
-                                margin: EdgeInsets.all(5),
+                                margin:const EdgeInsets.all(5),
                                 decoration: const BoxDecoration(
                                     color: Colors.white,
                                     borderRadius:
